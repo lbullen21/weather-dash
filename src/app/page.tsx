@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import SearchBar from "../components/SearchBar.component";
 
 type Hour = { time: string; tempC: number };
 type Weather = {
@@ -16,26 +17,17 @@ export default function Page() {
 
 
   return (
-    <main className="mx-auto max-w-3xl p-6">
-      <h1 className="text-3xl font-semibold mb-4">Weather Dash</h1>
-
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
+  <div className=" mx-auto max-w-3xl rounded-2xl p-6 bg-gradient-to-br from-teal-100 via-teal-200 to-purple-300">
+      <SearchBar
+        value={city}
+        onChange={(v) => setCity(v)}
+        onSubmit={() => {
+          /* form submit handled here if you want to trigger fetch */
         }}
-        className="flex gap-2 mb-6"
-      >
-        <input
-          className="border rounded px-3 py-2 flex-1"
-          value={city}
-          onChange={(e) => setCity(e.target.value)}
-          placeholder="Search city…"
-        />
-        <button className="rounded px-4 py-2 border" disabled={loading}>
-          {loading ? "Loading…" : "Search"}
-        </button>
-      </form>
+        loading={loading}
+        className="flex items-center"
+      />
 
-    </main>
+    </div>
   );
 }
