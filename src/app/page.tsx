@@ -1,33 +1,45 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import SearchBar from "../components/SearchBar.component";
-
-type Hour = { time: string; tempC: number };
-type Weather = {
-  city: string;
-  current: { tempC: number; tempF: number; condition: string };
-  hourly: Hour[];
-};
+import Temperature from "../components/Temperature.component";
+import Humidity from "../components/Humidity.component";
+import WindSpeed from "../components/WindSpeed.component";
+import { getWeatherForCity, Weather } from "../lib/openweather";
 
 export default function Page() {
-  const [city, setCity] = useState("Bend");
+  const [city, setCity] = useState("");
   const [data, setData] = useState<Weather | null>(null);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
+  async function fetchWeatherForCity(query: string) {
+    try {
+      setErr(null);
+      setLoading(true);
+      const w = await getWeatherForCity(query);
+      setData(w);
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : String(e);
+      setErr(message);
+      setData(null);
+    } finally {
+      setLoading(false);
+    }
+  }
+  
 
   return (
-  <div className=" mx-auto max-w-3xl rounded-2xl p-6 bg-gradient-to-br from-teal-100 via-teal-200 to-purple-300">
+    <div className="flex flex-col mx-auto max-w-3xl rounded-2xl gap-8 p-10 bg-gradient-to-br from-blue-400 via-indigo-500 to-purple-700">
       <SearchBar
         value={city}
         onChange={(v) => setCity(v)}
-        onSubmit={() => {
-          /* form submit handled here if you want to trigger fetch */
-        }}
-        loading={loading}
-        className="flex items-center"
+        onSubmit={() => fetchWeatherForCity(city)}
       />
-
+      <Temperature data={data} loading={loading} error={err} />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Humidity data={data} loading={loading} error={err} />
+        <WindSpeed data={data} loading={loading} error={err} />
+      </div>
     </div>
   );
 }
