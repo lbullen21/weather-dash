@@ -37,6 +37,7 @@ export async function getWeatherForCity(query: string): Promise<Weather> {
 
   // Parse query into parts
   const { city, state, country } = parseLocationQuery(query);
+  console.log({ city, state, country });
   
   // Build q parameter: "city,state,country" (omit undefined parts)
   const locationQuery = [
@@ -49,13 +50,10 @@ export async function getWeatherForCity(query: string): Promise<Weather> {
   const geoRes = await fetch(
     `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(locationQuery)}&limit=1&appid=${key}`
   );
+
+  console.log({ geoRes });
   const geoJson = await geoRes.json() as GeoLocation[];
   
-  if (!Array.isArray(geoJson) || geoJson.length === 0) {
-    throw new Error(
-      `Location not found${state ? ` in ${state}` : ''}${country ? `, ${country}` : ''}`
-    );
-  }
   
   const { lat, lon, name } = geoJson[0];
 
