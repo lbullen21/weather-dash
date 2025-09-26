@@ -13,7 +13,9 @@ export default function SearchBar({ value, onChange, onSubmit }: Props) {
   const [suggestions, setSuggestions] = useState<PlacePrediction[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [selectedValue, setSelectedValue] = useState<string | null>(null);
 
+  // Effect for fetching suggestions
   useEffect(() => {
     const fetchSuggestions = async () => {
       if (!value.trim()) {
@@ -35,6 +37,14 @@ export default function SearchBar({ value, onChange, onSubmit }: Props) {
     const timeoutId = setTimeout(fetchSuggestions, 300); // Debounce
     return () => clearTimeout(timeoutId);
   }, [value]);
+
+  // Effect for handling selection
+  useEffect(() => {
+    if (selectedValue && selectedValue === value) {
+      onSubmit?.();
+      setSelectedValue(null);
+    }
+  }, [selectedValue, value, onSubmit]);
 
   return (
     <div className="relative w-full">
@@ -76,9 +86,10 @@ export default function SearchBar({ value, onChange, onSubmit }: Props) {
                   key={suggestion.description}
                   className="px-4 py-2 hover:bg-gray-100 cursor-pointer"
                   onClick={() => {
-                    onChange(suggestion.description);
+                    const newValue = suggestion.description;
+                    setSelectedValue(newValue);
+                    onChange(newValue);
                     setShowSuggestions(false);
-                    onSubmit?.(); // Trigger search when suggestion is selected
                   }}
                 >
                   <div className="font-medium">{suggestion.mainText}</div>
