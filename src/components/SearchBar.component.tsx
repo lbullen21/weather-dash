@@ -78,6 +78,7 @@ export default function SearchBar({ value, onChange, onSubmit }: Props) {
                   onClick={() => {
                     onChange(suggestion.description);
                     setShowSuggestions(false);
+                    onSubmit?.(); // Trigger search when suggestion is selected
                   }}
                 >
                   <div className="font-medium">{suggestion.mainText}</div>
