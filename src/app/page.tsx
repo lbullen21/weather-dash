@@ -20,11 +20,19 @@ export default function Page() {
         async (position) => {
           try {
             setLoading(true);
+            const startTime = Date.now();
+
             const weather = await getWeatherByCoordinates(
               position.coords.latitude,
               position.coords.longitude
             );
             setData(weather);
+
+            // Ensure loading shows for at least 0.5 seconds
+            const elapsed = Date.now() - startTime;
+            if (elapsed < 700) {
+              await new Promise(resolve => setTimeout(resolve, 700 - elapsed));
+            }
           } catch (e) {
             const message = e instanceof Error ? e.message : String(e);
             setErr(message);
@@ -44,8 +52,16 @@ export default function Page() {
     try {
       setErr(null);
       setLoading(true);
+      const startTime = Date.now();
+      
       const w = await getWeatherForCity(query);
       setData(w);
+
+      // Ensure loading shows for at least 0.5 seconds
+      const elapsed = Date.now() - startTime;
+      if (elapsed < 500) {
+        await new Promise(resolve => setTimeout(resolve, 500 - elapsed));
+      }
     } catch (e: unknown) {
       const message = e instanceof Error ? e.message : String(e);
       setErr(message);

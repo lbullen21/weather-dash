@@ -8,13 +8,29 @@ type Props = {
   error?: string | null;
 };
 
-export default function Temperature({ data }: Props) {
+export default function Humidity({ data, loading }: Props) {
     const humidity = data?.current.humidity;
+
+    if (loading) {
+        return (
+            <div>
+                {/* Skeleton for humidity icon */}
+                <div className="w-[100px] h-[100px] bg-gray-100 rounded-full mx-auto animate-pulse" />
+                <div className="mt-6 mx-auto text-center">
+                    {/* Skeleton for humidity value */}
+                    <div className="w-20 h-8 bg-gray-100 rounded-lg mx-auto animate-pulse mb-2" />
+                    {/* Skeleton for label */}
+                    <div className="w-24 h-6 bg-gray-100 rounded-lg mx-auto animate-pulse" />
+                </div>
+            </div>
+        );
+    }
+
     return (
     <div>
         <Image 
             src="/images/waves.png" 
-            alt="Weather condition" 
+            alt="Humidity indicator" 
             width={100} 
             height={100} 
             className="mx-auto"

@@ -25,10 +25,25 @@ function getWeatherImage(condition: string): string {
   return 'cloudy.png';
 }
 
-export default function Temperature({ data }: Props) {
+export default function Temperature({ data, loading }: Props) {
     const temperature = data?.current.tempF;
     const condition = data?.current.condition ?? 'clear';
     const weatherImage = getWeatherImage(condition);
+
+    if (loading) {
+        return (
+            <div>
+                {/* Skeleton for weather icon */}
+                <div className="w-[200px] h-[200px] bg-gray-100 rounded-full mx-auto animate-pulse" />
+                <div className="mt-6 text-center">
+                    {/* Skeleton for temperature */}
+                    <div className="w-32 h-16 bg-gray-100 rounded-lg mx-auto animate-pulse mb-2" />
+                    {/* Skeleton for city name */}
+                    <div className="w-48 h-8 bg-gray-100 rounded-lg mx-auto animate-pulse" />
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div>
