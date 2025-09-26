@@ -1,5 +1,5 @@
 "use client";
-import { Weather } from "../lib/openweather";
+import { Weather } from "../types/weather";
 import Image from "next/image";
 
 type Props = {
@@ -8,9 +8,9 @@ type Props = {
   error?: string | null;
 };
 
-export default function Temperature({ data, loading, error }: Props) {
-    console.log({data, loading, error});
-  return (
+export default function Temperature({ data }: Props) {
+    const humidity = data?.current.humidity;
+    return (
     <div>
         <Image 
             src="/images/waves.png" 
@@ -19,11 +19,8 @@ export default function Temperature({ data, loading, error }: Props) {
             height={100} 
             className="mx-auto"
         />
-      {error && <div className="text-red-600">{error}</div>}
-
-      {loading && <div className="text-gray-600">Loading...</div>}
-        <div className="mt-6 mx-auto text-center">
-          <div className="text-3xl">80%</div>
+        <div className="mt-6 mx-auto text-center text-white">
+          <div className="text-3xl">{humidity}%</div>
           <h2 className="text-xl font-semibold">Humidity</h2>
         </div>
     </div>

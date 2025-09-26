@@ -1,100 +1,112 @@
-type Hour = { time: string; tempC: number };
-export type Weather = {
-  city: string;
-  current: { tempC: number; tempF: number; condition: string };
-  hourly: Hour[];
-};
+import { Weather } from '../types/weather';
 
-type GeoLocation = {
-  name: string;
-  local_names?: Record<string, string>;
-  lat: number;
-  lon: number;
-  country: string;
-  state?: string;
-};
+const WEATHER_BASE_URL = 'https://api.openweathermap.org/data/2.5/weather';
 
-type LocationQuery = {
-  city: string;
-  state?: string;
-  country?: string;
-};
-
-function parseLocationQuery(query: string): LocationQuery {
-  // Split on commas and trim whitespace
-  const parts = query.split(',').map(part => part.trim());
-  
-  return {
-    city: parts[0],
-    state: parts[1],
-    country: parts[2],
-  };
+// Get the API key once and validate it exists
+function getApiKey(): string {
+  const key = process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY;
+  if (!key) {
+    throw new Error("Missing NEXT_PUBLIC_OPENWEATHER_API_KEY in environment variables");
+  }
+  return key;
 }
 
-export async function getWeatherForCity(query: string): Promise<Weather> {
-  const key = process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY;
-  if (!key) throw new Error("Missing NEXT_PUBLIC_OPENWEATHER_API_KEY");
+const API_KEY = getApiKey();
 
-  // Parse query into parts
-  const { city, state, country } = parseLocationQuery(query);
-  console.log({ city, state, country });
-  
-  // Build q parameter: "city,state,country" (omit undefined parts)
-  const locationQuery = [
-    city,
-    state,
-    country
-  ].filter(Boolean).join(',');
-
-  // Geocode with proper query structure
-  const geoRes = await fetch(
-    `https://api.openweathermap.org/geo/1.0/direct?q=${encodeURIComponent(locationQuery)}&limit=1&appid=${key}`
-  );
-
-  console.log({ geoRes });
-  const geoJson = await geoRes.json() as GeoLocation[];
-  
-  
-  const { lat, lon, name } = geoJson[0];
-
-  type WeatherCondition = {
-    id: number;
+interface WeatherResponse {
+  name: string;
+  main: {
+    temp: number;
+    humidity: number;
+  };
+  wind: {
+    speed: number;
+  };
+  weather: Array<{
     main: string;
-    description: string;
-    icon: string;
-  };
+  }>;
+}
 
-  type OneCallResponse = {
-    current: {
-      dt: number;
-      temp: number;
-      weather: WeatherCondition[];
+/**
+ * Main function to get weather for a city
+ * @param cityQuery City name (can include state and country)
+ * @returns Promise with formatted weather data
+ */
+export async function getWeatherByCoordinates(lat: number, lon: number): Promise<Weather> {
+  try {
+    const url = new URL(WEATHER_BASE_URL);
+    url.searchParams.append('lat', lat.toString());
+    url.searchParams.append('lon', lon.toString());
+    url.searchParams.append('units', 'imperial');
+    url.searchParams.append('appid', API_KEY);
+
+    const response = await fetch(url.toString());
+    
+    if (!response.ok) {
+      throw new Error(`Failed to get weather data: ${response.statusText}`);
+    }
+
+    const weatherData = await response.json() as WeatherResponse;
+
+    return {
+      city: weatherData.name,
+      current: {
+        tempC: Math.round((weatherData.main.temp - 32) * 5/9),
+        tempF: Math.round(weatherData.main.temp),
+        condition: weatherData.weather[0].main,
+        humidity: weatherData.main.humidity,
+        windSpeed: weatherData.wind.speed,
+      },
+      hourly: [],
     };
-    hourly?: Array<{
-      dt: number;
-      temp: number;
-      weather: WeatherCondition[];
-    }>;
-  };
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(`Weather lookup failed: ${error.message}`);
+    }
+    throw error;
+  }
+}
 
-  // One Call
-  const onecallRes = await fetch(
-    `https://api.openweathermap.org/data/3.0/onecall?lat=${lat}&lon=${lon}&exclude=minutely,alerts&units=metric&appid=${key}`
-  );
-  const onecallJson = await onecallRes.json() as OneCallResponse;
+export async function getWeatherForCity(cityQuery: string): Promise<Weather> {
+  try {
+    // Validate city query
+    const trimmedCity = cityQuery.trim();
+    if (!trimmedCity) {
+      throw new Error('Please enter a city name');
+    }
 
-  const mapped: Weather = {
-    city: name || query,
-    current: {
-      tempC: onecallJson.current?.temp ?? 0,
-      tempF: Math.round((onecallJson.current?.temp ?? 0) * 9 / 5 + 32),
-      condition: onecallJson.current?.weather?.[0]?.description || "",
-    },
-    hourly: (onecallJson.hourly || []).slice(0, 12).map(h => ({
-      time: new Date(h.dt * 1000).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-      tempC: h.temp,
-    })),
-  };
+    const url = new URL(WEATHER_BASE_URL);
+    url.searchParams.append('q', trimmedCity);
+    url.searchParams.append('units', 'imperial');
+    url.searchParams.append('appid', API_KEY);
 
-  return mapped;
+    const response = await fetch(url.toString());
+    
+    if (!response.ok) {
+      throw new Error(`Failed to get weather data: ${response.statusText}`);
+    }
+
+    const weatherData = await response.json() as WeatherResponse;
+    console.log('Raw weather data:', weatherData);
+    console.log('City:', weatherData.main.humidity);
+
+    // Format the response
+    return {
+      city: weatherData.name,
+      current: {
+        tempC: Math.round((weatherData.main.temp - 32) * 5/9),
+        tempF: Math.round(weatherData.main.temp),
+        condition: weatherData.weather[0].main,
+        humidity: weatherData.main.humidity,
+        windSpeed: weatherData.wind.speed,
+      },
+      hourly: [], // Note: This basic endpoint doesn't provide hourly data
+    };
+  } catch (error) {
+    // Enhance error message for user-friendly feedback
+    if (error instanceof Error) {
+      throw new Error(`Weather lookup failed: ${error.message}`);
+    }
+    throw error;
+  }
 }

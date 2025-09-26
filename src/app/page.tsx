@@ -1,16 +1,44 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import SearchBar from "../components/SearchBar.component";
 import Temperature from "../components/Temperature.component";
 import Humidity from "../components/Humidity.component";
 import WindSpeed from "../components/WindSpeed.component";
-import { getWeatherForCity, Weather } from "../lib/openweather";
+import { Weather } from "../types/weather";  
+import { getWeatherForCity, getWeatherByCoordinates } from "../lib/openweather";
 
 export default function Page() {
   const [city, setCity] = useState("");
   const [data, setData] = useState<Weather | null>(null);
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+
+  // Get user's location and weather on component mount
+  useEffect(() => {
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          try {
+            setLoading(true);
+            const weather = await getWeatherByCoordinates(
+              position.coords.latitude,
+              position.coords.longitude
+            );
+            setData(weather);
+          } catch (e) {
+            const message = e instanceof Error ? e.message : String(e);
+            setErr(message);
+          } finally {
+            setLoading(false);
+          }
+        },
+        (error) => {
+          console.error("Error getting location:", error);
+          setErr("Could not get your location. Please search for a city instead.");
+        }
+      );
+    }
+  }, []);
 
   async function fetchWeatherForCity(query: string) {
     try {
