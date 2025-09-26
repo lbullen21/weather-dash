@@ -87,8 +87,6 @@ export async function getWeatherForCity(cityQuery: string): Promise<Weather> {
     }
 
     const weatherData = await response.json() as WeatherResponse;
-    console.log('Raw weather data:', weatherData);
-    console.log('City:', weatherData.main.humidity);
 
     // Format the response
     return {
