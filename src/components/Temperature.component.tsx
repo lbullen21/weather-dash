@@ -55,8 +55,8 @@ export default function Temperature({ data, loading }: Props) {
                 className="mx-auto h-[100px] w-[100px] sm:h-[200px] sm:w-[200px]"
             />
             <div className="mt-6 text-center text-white">
-                <div className="text-3xl md:text-7xl">{temperature}°F</div>
-                <div className="text-xl md:text-3xl font-semibold">{data?.city}</div>
+                <div className="text-3xl sm:text-7xl">{temperature}°F</div>
+                <div className="text-xl sm:text-3xl font-semibold">{data?.city}</div>
             </div>
         </div>
     );
