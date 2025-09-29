@@ -38,7 +38,7 @@ export default function WindSpeed({ data, loading }: Props) {
 
         <div className="mt-6 mx-auto text-center text-white">
           <div className="text-3xl">{windSpeed} m/hr</div>
-          <h2 className="text-xl font-semibold">Wind Speed</h2>
+          <div className="text-xl font-semibold">Wind Speed</div>
         </div>
     </div>
   );

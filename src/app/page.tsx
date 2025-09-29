@@ -80,7 +80,7 @@ export default function Page() {
         onSubmit={() => fetchWeatherForCity(city)}
       />
       <Temperature data={data} loading={loading} error={err} />
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Humidity data={data} loading={loading} error={err} />
         <WindSpeed data={data} loading={loading} error={err} />
       </div>

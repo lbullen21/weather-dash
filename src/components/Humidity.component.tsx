@@ -37,7 +37,7 @@ export default function Humidity({ data, loading }: Props) {
         />
         <div className="mt-6 mx-auto text-center text-white">
           <div className="text-3xl">{humidity}%</div>
-          <h2 className="text-xl font-semibold">Humidity</h2>
+          <div className="text-xl font-semibold">Humidity</div>
         </div>
     </div>
   );

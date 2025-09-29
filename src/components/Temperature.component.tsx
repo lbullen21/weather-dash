@@ -34,7 +34,7 @@ export default function Temperature({ data, loading }: Props) {
         return (
             <div>
                 {/* Skeleton for weather icon */}
-                <div className="w-[200px] h-[200px] bg-gray-100 rounded-full mx-auto animate-pulse" />
+                <div className="w-[100px] h-[100px] md:w-[200px] md:h-[200px] bg-gray-100 rounded-full mx-auto animate-pulse" />
                 <div className="mt-6 text-center">
                     {/* Skeleton for temperature */}
                     <div className="w-32 h-16 bg-gray-100 rounded-lg mx-auto animate-pulse mb-2" />
@@ -50,13 +50,13 @@ export default function Temperature({ data, loading }: Props) {
             <Image 
                 src={`/images/${weatherImage}`}
                 alt={`Weather condition: ${condition}`}
-                width={200} 
-                height={200} 
-                className="mx-auto"
+                width={200}
+                height={200}
+                className="mx-auto h-[100px] w-[100px] sm:h-[200px] sm:w-[200px]"
             />
             <div className="mt-6 text-center text-white">
-                <div className="text-7xl">{temperature}°F</div>
-                <h2 className="text-3xl">{data?.city}</h2>
+                <div className="text-3xl md:text-7xl">{temperature}°F</div>
+                <div className="text-xl md:text-3xl font-semibold">{data?.city}</div>
             </div>
         </div>
     );
