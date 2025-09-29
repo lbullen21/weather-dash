@@ -16,7 +16,8 @@ export async function GET(request: Request) {
       params: {
         input,
         key: process.env.GOOGLE_MAPS_API_KEY!,
-        types: "(cities)" as any, // Restrict to cities
+        // @ts-expect-error The Google Places API specifically requires "(cities)" string
+        types: "(cities)", // Restrict to cities
       },
     });
 
