@@ -25,6 +25,11 @@ interface WeatherResponse {
   weather: Array<{
     main: string;
   }>;
+  sys: {
+    sunrise: number;
+    sunset: number;
+  };
+  dt: number;
 }
 
 /**
@@ -48,6 +53,11 @@ export async function getWeatherByCoordinates(lat: number, lon: number): Promise
 
     const weatherData = await response.json() as WeatherResponse;
 
+    const currentTime = weatherData.dt * 1000; // Convert to milliseconds
+    const sunrise = weatherData.sys.sunrise * 1000;
+    const sunset = weatherData.sys.sunset * 1000;
+    const isDay = currentTime > sunrise && currentTime < sunset;
+
     return {
       city: weatherData.name,
       current: {
@@ -56,6 +66,7 @@ export async function getWeatherByCoordinates(lat: number, lon: number): Promise
         condition: weatherData.weather[0].main,
         humidity: weatherData.main.humidity,
         windSpeed: weatherData.wind.speed,
+        isDay,
       },
       hourly: [],
     };
@@ -89,6 +100,11 @@ export async function getWeatherForCity(cityQuery: string): Promise<Weather> {
     const weatherData = await response.json() as WeatherResponse;
 
     // Format the response
+    const currentTime = weatherData.dt * 1000; // Convert to milliseconds
+    const sunrise = weatherData.sys.sunrise * 1000;
+    const sunset = weatherData.sys.sunset * 1000;
+    const isDay = currentTime > sunrise && currentTime < sunset;
+
     return {
       city: weatherData.name,
       current: {
@@ -97,6 +113,7 @@ export async function getWeatherForCity(cityQuery: string): Promise<Weather> {
         condition: weatherData.weather[0].main,
         humidity: weatherData.main.humidity,
         windSpeed: weatherData.wind.speed,
+        isDay,
       },
       hourly: [], // Note: This basic endpoint doesn't provide hourly data
     };

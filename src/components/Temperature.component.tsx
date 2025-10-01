@@ -8,11 +8,20 @@ type Props = {
   error?: string | null;
 };
 
-function getWeatherImage(condition: string): string {
+function getWeatherImage(condition: string, isDay: boolean, tempF: number): string {
   // Convert condition to lowercase for case-insensitive matching
   const lowerCondition = condition.toLowerCase();
   
-  // Map conditions to image files
+  // Night time conditions
+  if (!isDay) {
+    if (lowerCondition.includes('clouds')) return 'night.png';
+    if (lowerCondition.includes('clear')) {
+      if (tempF <= 32) return 'stars.png';
+      return 'moon.png';
+    }
+  }
+
+  // Day time or other conditions
   if (lowerCondition.includes('thunderstorm')) return 'heavy-rain.png';
   if (lowerCondition.includes('drizzle')) return 'cloudy-showers.png';
   if (lowerCondition.includes('rain')) return 'heavy-rain.png';
@@ -28,7 +37,7 @@ function getWeatherImage(condition: string): string {
 export default function Temperature({ data, loading }: Props) {
     const temperature = data?.current.tempF;
     const condition = data?.current.condition ?? 'clear';
-    const weatherImage = getWeatherImage(condition);
+    const weatherImage = getWeatherImage(condition, data?.current.isDay ?? true, temperature ?? 75);
 
     if (loading) {
         return (

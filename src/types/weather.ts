@@ -2,7 +2,14 @@ type Hour = { time: string; tempC: number };
 
 export type Weather = {
   city: string;
-  current: { tempC: number; tempF: number; condition: string, humidity: number, windSpeed: number; };
+  current: { 
+    tempC: number; 
+    tempF: number; 
+    condition: string;
+    humidity: number;
+    windSpeed: number;
+    isDay: boolean;
+  };
   hourly: Hour[];
 };
 
